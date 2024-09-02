@@ -14,11 +14,11 @@ type Server interface {
 	Readiness(ctx echo.Context) error
 	Liveness(ctx echo.Context) error
 
-	GetAllCustomers(ctx echo.Context) error
-	AddCustomer(ctx echo.Context) error
-	GetCustomerById(ctx echo.Context) error
-	UpdateCustomer(ctx echo.Context) error
-	DeleteCustomer(ctx echo.Context) error
+	GetAllOwners(ctx echo.Context) error
+	AddOwner(ctx echo.Context) error
+	GetOwnerById(ctx echo.Context) error
+	UpdateOwner(ctx echo.Context) error
+	DeleteOwner(ctx echo.Context) error
 
 	GetAllProducts(ctx echo.Context) error
 	AddProduct(ctx echo.Context) error
@@ -65,12 +65,12 @@ func (s *EchoServer) registerRoutes() {
 	s.echo.GET("/readiness", s.Readiness)
 	s.echo.GET("/liveness", s.Liveness)
 
-	cg := s.echo.Group("/customers")
-	cg.GET("", s.GetAllCustomers)
-	cg.GET("/:id", s.GetCustomerById)
-	cg.POST("", s.AddCustomer)
-	cg.PUT("/:id", s.UpdateCustomer)
-	cg.DELETE("/:id", s.DeleteCustomer)
+	og := s.echo.Group("/owners")
+	og.GET("", s.GetAllOwners)
+	og.GET("/:id", s.GetOwnerById)
+	og.POST("", s.AddOwner)
+	og.PUT("/:id", s.UpdateOwner)
+	og.DELETE("/:id", s.DeleteOwner)
 
 	pg := s.echo.Group("/products")
 	pg.GET("", s.GetAllProducts)

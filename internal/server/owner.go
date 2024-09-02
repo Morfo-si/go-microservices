@@ -8,22 +8,22 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllCustomers(ctx echo.Context) error {
+func (s *EchoServer) GetAllOwners(ctx echo.Context) error {
 	emailAddress := ctx.QueryParam("emailAddress")
 
-	customers, err := s.DB.GetAllCustomers(ctx.Request().Context(), emailAddress)
+	owners, err := s.DB.GetAllOwners(ctx.Request().Context(), emailAddress)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(http.StatusOK, customers)
+	return ctx.JSON(http.StatusOK, owners)
 }
 
-func (s *EchoServer) AddCustomer(ctx echo.Context) error {
-	customer := new(models.Customer)
-	if err := ctx.Bind(customer); err != nil {
+func (s *EchoServer) AddOwner(ctx echo.Context) error {
+	owner := new(models.Owner)
+	if err := ctx.Bind(owner); err != nil {
 		return ctx.JSON(http.StatusUnsupportedMediaType, err)
 	}
-	customer, err := s.DB.AddCustomer(ctx.Request().Context(), customer)
+	owner, err := s.DB.AddOwner(ctx.Request().Context(), owner)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.ConflictError:
@@ -32,12 +32,12 @@ func (s *EchoServer) AddCustomer(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusCreated, customer)
+	return ctx.JSON(http.StatusCreated, owner)
 }
 
-func (s *EchoServer) GetCustomerById(ctx echo.Context) error {
+func (s *EchoServer) GetOwnerById(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	customer, err := s.DB.GetCustomerById(ctx.Request().Context(), ID)
+	owner, err := s.DB.GetOwnerById(ctx.Request().Context(), ID)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
@@ -46,19 +46,19 @@ func (s *EchoServer) GetCustomerById(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, customer)
+	return ctx.JSON(http.StatusOK, owner)
 }
 
-func (s *EchoServer) UpdateCustomer(ctx echo.Context) error {
+func (s *EchoServer) UpdateOwner(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	customer := new(models.Customer)
-	if err := ctx.Bind(customer); err != nil {
+	owner := new(models.Owner)
+	if err := ctx.Bind(owner); err != nil {
 		return ctx.JSON(http.StatusUnsupportedMediaType, err)
 	}
-	if ID != customer.CustomerID {
+	if ID != owner.OwnerID {
 		return ctx.JSON(http.StatusBadRequest, "id on path does not match id on body")
 	}
-	customer, err := s.DB.UpdateCustomer(ctx.Request().Context(), customer)
+	owner, err := s.DB.UpdateOwner(ctx.Request().Context(), owner)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
@@ -69,12 +69,12 @@ func (s *EchoServer) UpdateCustomer(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, customer)
+	return ctx.JSON(http.StatusOK, owner)
 }
 
-func (s *EchoServer) DeleteCustomer(ctx echo.Context) error {
+func (s *EchoServer) DeleteOwner(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	err := s.DB.DeleteCustomer(ctx.Request().Context(), ID)
+	err := s.DB.DeleteOwner(ctx.Request().Context(), ID)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}

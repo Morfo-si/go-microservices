@@ -14,11 +14,11 @@ import (
 type DatabaseClient interface {
 	Ready() bool
 
-	GetAllCustomers(ctx context.Context, emailAddress string) ([]models.Customer, error)
-	AddCustomer(ctx context.Context, customer *models.Customer) (*models.Customer, error)
-	GetCustomerById(ctx context.Context, ID string) (*models.Customer, error)
-	UpdateCustomer(ctx context.Context, customer *models.Customer) (*models.Customer, error)
-	DeleteCustomer(ctx context.Context, ID string) error
+	GetAllOwners(ctx context.Context, emailAddress string) ([]models.Owner, error)
+	AddOwner(ctx context.Context, owner *models.Owner) (*models.Owner, error)
+	GetOwnerById(ctx context.Context, ID string) (*models.Owner, error)
+	UpdateOwner(ctx context.Context, owner *models.Owner) (*models.Owner, error)
+	DeleteOwner(ctx context.Context, ID string) error
 
 	GetAllProducts(ctx context.Context, vendorID string) ([]models.Product, error)
 	AddProduct(ctx context.Context, product *models.Product) (*models.Product, error)
@@ -43,6 +43,8 @@ type Client struct {
 	DB *gorm.DB
 }
 
+const TablePrefix = "pet_clinic."
+
 func NewDatabaseClient() (DatabaseClient, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
 		"localhost",
@@ -54,7 +56,7 @@ func NewDatabaseClient() (DatabaseClient, error) {
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: "wisdom.",
+			TablePrefix: TablePrefix,
 		},
 		NowFunc: func() time.Time {
 			return time.Now().UTC()
