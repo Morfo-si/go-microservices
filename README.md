@@ -1,6 +1,6 @@
 # Go Microservices
 
-A sample [Golang](https://go.dev) application to illustrate how a fully functional `microservice` can be written. The source code is a modificated version for the example provided in the online course ["Build a Microservice with Go" by Frank P Moley III](https://www.linkedin.com/learning/build-a-microservice-with-go).
+A sample [Golang](https://go.dev) application to illustrate how a fully functional `microservice` can be written. The source code is a modified version for the example provided in the online course ["Build a Microservice with Go" by Frank P Moley III](https://www.linkedin.com/learning/build-a-microservice-with-go).
 
 ## Pre-requisites
 
