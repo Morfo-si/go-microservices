@@ -11,10 +11,10 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func (c Client) GetAllProducts(ctx context.Context, vendorID string) ([]models.Product, error) {
+func (c Client) GetAllProducts(ctx context.Context, productID string) ([]models.Product, error) {
 	var products []models.Product
 	result := c.DB.WithContext(ctx).
-		Where(models.Product{VendorID: vendorID}).
+		Where(models.Product{VendorID: productID}).
 		Find(&products)
 	return products, result.Error
 }
