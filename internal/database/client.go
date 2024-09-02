@@ -5,10 +5,20 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/morfo-si/go-microservices/internal/configuration"
 	"github.com/morfo-si/go-microservices/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+type Config struct {
+	Host     string
+	User     string
+	Password string
+	DBName   string
+	Port     string
+	SSLMode  string
+}
 
 type DatabaseClient interface {
 	Ready() bool
@@ -39,18 +49,21 @@ type DatabaseClient interface {
 }
 
 type Client struct {
-	DB *gorm.DB
+	DB     *gorm.DB
+	Config *configuration.Config
 }
 
-func NewDatabaseClient() (DatabaseClient, error) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
-		"localhost",
-		"postgres",
-		"postgres",
-		"petclinic",
-		5432,
-		"disable",
+func NewDatabaseClient(config *configuration.Config) (DatabaseClient, error) {
+	// Load environment variables from .env file
+	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
+		config.Host,
+		config.User,
+		config.Password,
+		config.DBName,
+		config.Port,
+		config.SSLMode,
 	)
+
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		NowFunc: func() time.Time {
 			return time.Now().UTC()
@@ -62,7 +75,8 @@ func NewDatabaseClient() (DatabaseClient, error) {
 		return nil, err
 	}
 	client := Client{
-		DB: db,
+		DB:     db,
+		Config: config,
 	}
 	return client, nil
 }
