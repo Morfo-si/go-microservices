@@ -1,5 +1,5 @@
 # Define variables
-CONTAINER_NAME=local-pg
+CONTAINER_NAME=petclinic-pg
 DB_NAME=postgres
 POSTGRES_PASSWORD=postgres
 POSTGRES_USERNAME=postgres
