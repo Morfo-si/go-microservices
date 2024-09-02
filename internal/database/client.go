@@ -20,23 +20,23 @@ type DatabaseClient interface {
 	UpdateOwner(ctx context.Context, owner *models.Owner) (*models.Owner, error)
 	DeleteOwner(ctx context.Context, ID string) error
 
-	GetAllProducts(ctx context.Context, vendorID string) ([]models.Product, error)
-	AddProduct(ctx context.Context, product *models.Product) (*models.Product, error)
-	GetProductById(ctx context.Context, ID string) (*models.Product, error)
-	UpdateProduct(ctx context.Context, product *models.Product) (*models.Product, error)
-	DeleteProduct(ctx context.Context, ID string) error
+	GetAllAppointments(ctx context.Context, appointmentID string) ([]models.Appointment, error)
+	AddAppointment(ctx context.Context, appointment *models.Appointment) (*models.Appointment, error)
+	GetAppointmentById(ctx context.Context, ID string) (*models.Appointment, error)
+	UpdateAppointment(ctx context.Context, appointment *models.Appointment) (*models.Appointment, error)
+	DeleteAppointment(ctx context.Context, ID string) error
 
-	GetAllServices(ctx context.Context) ([]models.Service, error)
-	AddService(ctx context.Context, service *models.Service) (*models.Service, error)
-	GetServiceById(ctx context.Context, ID string) (*models.Service, error)
-	UpdateService(ctx context.Context, service *models.Service) (*models.Service, error)
-	DeleteService(ctx context.Context, ID string) error
+	GetAllPets(ctx context.Context) ([]models.Pet, error)
+	AddPet(ctx context.Context, pet *models.Pet) (*models.Pet, error)
+	GetPetById(ctx context.Context, ID string) (*models.Pet, error)
+	UpdatePet(ctx context.Context, pet *models.Pet) (*models.Pet, error)
+	DeletePet(ctx context.Context, ID string) error
 
-	GetAllVendors(ctx context.Context) ([]models.Vendor, error)
-	AddVendor(ctx context.Context, vendor *models.Vendor) (*models.Vendor, error)
-	GetVendorById(ctx context.Context, ID string) (*models.Vendor, error)
-	UpdateVendor(ctx context.Context, vendor *models.Vendor) (*models.Vendor, error)
-	DeleteVendor(ctx context.Context, ID string) error
+	GetAllVeterinarians(ctx context.Context) ([]models.Veterinarian, error)
+	AddVeterinarian(ctx context.Context, veterinarian *models.Veterinarian) (*models.Veterinarian, error)
+	GetVeterinarianById(ctx context.Context, ID string) (*models.Veterinarian, error)
+	UpdateVeterinarian(ctx context.Context, veterinarian *models.Veterinarian) (*models.Veterinarian, error)
+	DeleteVeterinarian(ctx context.Context, ID string) error
 }
 
 type Client struct {

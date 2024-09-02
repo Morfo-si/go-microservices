@@ -8,20 +8,22 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllVendors(ctx echo.Context) error {
-	vendors, err := s.DB.GetAllVendors(ctx.Request().Context())
+func (s *EchoServer) GetAllAppointments(ctx echo.Context) error {
+	appointmentId := ctx.QueryParam("appointmentId")
+
+	appointments, err := s.DB.GetAllAppointments(ctx.Request().Context(), appointmentId)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(http.StatusOK, vendors)
+	return ctx.JSON(http.StatusOK, appointments)
 }
 
-func (s *EchoServer) AddVendor(ctx echo.Context) error {
-	vendor := new(models.Vendor)
-	if err := ctx.Bind(vendor); err != nil {
+func (s *EchoServer) AddAppointment(ctx echo.Context) error {
+	appointment := new(models.Appointment)
+	if err := ctx.Bind(appointment); err != nil {
 		return ctx.JSON(http.StatusUnsupportedMediaType, err)
 	}
-	vendor, err := s.DB.AddVendor(ctx.Request().Context(), vendor)
+	appointment, err := s.DB.AddAppointment(ctx.Request().Context(), appointment)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.ConflictError:
@@ -30,12 +32,12 @@ func (s *EchoServer) AddVendor(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusCreated, vendor)
+	return ctx.JSON(http.StatusCreated, appointment)
 }
 
-func (s *EchoServer) GetVendorById(ctx echo.Context) error {
+func (s *EchoServer) GetAppointmentById(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	vendor, err := s.DB.GetVendorById(ctx.Request().Context(), ID)
+	appointment, err := s.DB.GetAppointmentById(ctx.Request().Context(), ID)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
@@ -44,19 +46,19 @@ func (s *EchoServer) GetVendorById(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, vendor)
+	return ctx.JSON(http.StatusOK, appointment)
 }
 
-func (s *EchoServer) UpdateVendor(ctx echo.Context) error {
+func (s *EchoServer) UpdateAppointment(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	vendor := new(models.Vendor)
-	if err := ctx.Bind(vendor); err != nil {
+	appointment := new(models.Appointment)
+	if err := ctx.Bind(appointment); err != nil {
 		return ctx.JSON(http.StatusUnsupportedMediaType, err)
 	}
-	if ID != vendor.VendorID {
+	if ID != appointment.AppointmentID {
 		return ctx.JSON(http.StatusBadRequest, "id on path doesn't match id on body")
 	}
-	vendor, err := s.DB.UpdateVendor(ctx.Request().Context(), vendor)
+	appointment, err := s.DB.UpdateAppointment(ctx.Request().Context(), appointment)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
@@ -67,12 +69,12 @@ func (s *EchoServer) UpdateVendor(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, vendor)
+	return ctx.JSON(http.StatusOK, appointment)
 }
 
-func (s *EchoServer) DeleteVendor(ctx echo.Context) error {
+func (s *EchoServer) DeleteAppointment(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	err := s.DB.DeleteVendor(ctx.Request().Context(), ID)
+	err := s.DB.DeleteAppointment(ctx.Request().Context(), ID)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}

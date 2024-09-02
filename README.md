@@ -1,6 +1,6 @@
 # Go Microservices
 
-A sample [Golang](https://go.dev) application to illustrate how a fully functional `microservice` can be written. The source code is provided as the final solution to the online course ["Build a Microservice with Go" by Frank P Moley III](https://www.linkedin.com/learning/build-a-microservice-with-go).
+A sample [Golang](https://go.dev) application to illustrate how a fully functional `microservice` can be written. The source code is a modificated version for the example provided in the online course ["Build a Microservice with Go" by Frank P Moley III](https://www.linkedin.com/learning/build-a-microservice-with-go).
 
 ## Pre-requisites
 
@@ -10,7 +10,7 @@ The following should be installed on your local system:
 * [Podman](https://podman.io/) or [Docker](https://www.docker.com) to run a containerized [PostgreSQL](https://www.postgresql.org/) database.
   
 > [!TIP]
-> **(OPTIONAL)** If you prefer to use a locally installed instance of [PostgreSQL](https://www.postgresql.org/), skip the next step to create the database 
+> **(OPTIONAL)** If you prefer to use a locally installed instance of [PostgreSQL](https://www.postgresql.org/), skip the next step to create the database.
 
 ## Create a Postgresql database
 
@@ -23,7 +23,7 @@ make start-db
 > [!NOTE] The database container will be created with the following configuration:
 >
 > ```text
->    Container name: local-pg
+>    Container name: petclinic-pg
 >    Database name: postgres
 >    Postgresql user: postgres
 >    Postgresql password: postgres
@@ -32,7 +32,7 @@ make start-db
 
 ## Create the database schema
 
-Execute the following command to create the `wisdom` database schema:
+Execute the following command to create the `pet_clinic` database schema:
 
 ```shell
 make apply-db-schema
@@ -40,50 +40,54 @@ make apply-db-schema
 
 ### Database Schema Description
 
-The schema `wisdom` contains the following tables:
+The schema `pet_clinic` contains the following tables:
 
-#### Table: `services`
+#### Table: `owners`
 
-This table stores information about different services.
+This table stores information about the owners.
 
-* **service_id**: `UUID` - Primary key, a unique identifier for each service.
-* **name**: `VARCHAR` - A unique name for the service.
-* **price**: `NUMERIC(12,2)` - The price of the service.
+* **owner_id**: `UUID` - Primary key, a unique identifier for each owner.
+* **first_name**: `VARCHAR(50)` - The first name of the owner.
+* **last_name**: `VARCHAR(50)` - The last name of the owner.
+* **email**: `VARCHAR(100)` - The email address of the owner, must be unique.
+* **phone**: `VARCHAR(20)` - The phone number of the owner.
+* **address**: `VARCHAR(255)` - The physical address of the owner.
 
-#### Table: `customers`
+#### Table: `pets`
 
-This table stores information about customers.
+This table stores information about the pets.
 
-* **customer_id**: `UUID` - Primary key, a unique identifier for each customer.
-* **first_name**: `VARCHAR` - The first name of the customer.
-* **last_name**: `VARCHAR` - The last name of the customer.
-* **email**: `VARCHAR` - The email address of the customer.
-* **phone**: `VARCHAR` - The phone number of the customer.
-* **address**: `VARCHAR` - The physical address of the customer.
+* **pet_id**: `UUID` - Primary key, a unique identifier for each pet.
+* **name**: `VARCHAR(50)` - The name of the pet.
+* **species**: `VARCHAR(50)` - The species of the pet (e.g., dog, cat).
+* **breed**: `VARCHAR(50)` - The breed of the pet.
+* **age**: `INTEGER` - The age of the pet.
+* **owner_id**: `UUID` - Foreign key, references the owner_id in the owners table.
 
-#### Table: `vendors`
+#### Table: `veterinarians`
 
-This table stores information about vendors.
+This table stores information about the veterinarians.
 
-* **vendor_id**: `UUID` - Primary key, a unique identifier for each vendor.
-* **name**: `VARCHAR` - The name of the vendor. This field is required.
-* **contact**: `VARCHAR` - The contact person's name at the vendor.
-* **phone**: `VARCHAR` - The phone number of the vendor.
-* **email**: `VARCHAR` - The email address of the vendor.
-* **address**: `VARCHAR` - The physical address of the vendor.
+* **veterinarian_id**: `UUID - Primary key, a unique identifier for each veterinarian.
+* **first_name**: `VARCHAR(50) - The first name of the veterinarian.
+* **last_name**: `VARCHAR(50) - The last name of the veterinarian.
+* **specialty**: `VARCHAR(100) - The specialty of the veterinarian (e.g., surgery, general practice).
+* **phone**: `VARCHAR(20) - The phone number of the veterinarian.
+* **email**: `VARCHAR(100) - The email address of the veterinarian, must be unique.
 
-#### Table: `products`
+#### Table: `appointments`
 
-This table stores information about products.
+This table stores information about the appointments.
 
-* **product_id**: `UUID` - Primary key, a unique identifier for each product.
-* **name**: `VARCHAR` - A unique name for the product.
-* **price**: `NUMERIC(12,2)` - The price of the product.
-* **vendor_id**: `UUID` - Foreign key, references the `vendor_id` in the `vendors` table.
+* **appointment_id**: `UUID` - Primary key, a unique identifier for each appointment.
+* **appointment_date**: `TIMESTAMP` - The date and time of the appointment.
+* **pet_id**: `UUID` - Foreign key, references the pet_id in the pets table.
+* **veterinarian_id**: `UUID` - Foreign key, references the veterinarian_id in the veterinarians table.
+* **reason**: `TEXT` - The reason for the appointment (e.g., check-up, vaccination).
 
 ## Populate the database
 
-Once the `wisdom` database schema is created, execute the following command to populate the `postgresql` database with sample data:
+Once the `pet_clinic` database schema is created, execute the following command to populate the `postgresql` database with sample data:
 
 ```shell
 make populate-db
@@ -101,10 +105,10 @@ The Go microservice API service can be reached at following endpoints:
 
 * `http://localhost:8080/liveness`;
 * `http://localhost:8080/readiness`;
-* `http://localhost:8080/customers`;
-* `http://localhost:8080/products`;
-* `http://localhost:8080/services`;
-* `http://localhost:8080/vendors`;
+* `http://localhost:8080/owners`;
+* `http://localhost:8080/appointments`;
+* `http://localhost:8080/pets`;
+* `http://localhost:8080/veterinarians`;
 
 ## Cleaning up the database
 

@@ -8,20 +8,20 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllServices(ctx echo.Context) error {
-	services, err := s.DB.GetAllServices(ctx.Request().Context())
+func (s *EchoServer) GetAllVeterinarians(ctx echo.Context) error {
+	veterinarians, err := s.DB.GetAllVeterinarians(ctx.Request().Context())
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(http.StatusOK, services)
+	return ctx.JSON(http.StatusOK, veterinarians)
 }
 
-func (s *EchoServer) AddService(ctx echo.Context) error {
-	service := new(models.Service)
-	if err := ctx.Bind(service); err != nil {
+func (s *EchoServer) AddVeterinarian(ctx echo.Context) error {
+	veterinarian := new(models.Veterinarian)
+	if err := ctx.Bind(veterinarian); err != nil {
 		return ctx.JSON(http.StatusUnsupportedMediaType, err)
 	}
-	service, err := s.DB.AddService(ctx.Request().Context(), service)
+	veterinarian, err := s.DB.AddVeterinarian(ctx.Request().Context(), veterinarian)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.ConflictError:
@@ -30,12 +30,12 @@ func (s *EchoServer) AddService(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusCreated, service)
+	return ctx.JSON(http.StatusCreated, veterinarian)
 }
 
-func (s *EchoServer) GetServiceById(ctx echo.Context) error {
+func (s *EchoServer) GetVeterinarianById(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	service, err := s.DB.GetServiceById(ctx.Request().Context(), ID)
+	veterinarian, err := s.DB.GetVeterinarianById(ctx.Request().Context(), ID)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
@@ -44,19 +44,19 @@ func (s *EchoServer) GetServiceById(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, service)
+	return ctx.JSON(http.StatusOK, veterinarian)
 }
 
-func (s *EchoServer) UpdateService(ctx echo.Context) error {
+func (s *EchoServer) UpdateVeterinarian(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	service := new(models.Service)
-	if err := ctx.Bind(service); err != nil {
+	veterinarian := new(models.Veterinarian)
+	if err := ctx.Bind(veterinarian); err != nil {
 		return ctx.JSON(http.StatusUnsupportedMediaType, err)
 	}
-	if ID != service.ServiceID {
+	if ID != veterinarian.VeterinarianID {
 		return ctx.JSON(http.StatusBadRequest, "id on path doesn't match id on body")
 	}
-	service, err := s.DB.UpdateService(ctx.Request().Context(), service)
+	veterinarian, err := s.DB.UpdateVeterinarian(ctx.Request().Context(), veterinarian)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
@@ -67,12 +67,12 @@ func (s *EchoServer) UpdateService(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, service)
+	return ctx.JSON(http.StatusOK, veterinarian)
 }
 
-func (s *EchoServer) DeleteService(ctx echo.Context) error {
+func (s *EchoServer) DeleteVeterinarian(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	err := s.DB.DeleteService(ctx.Request().Context(), ID)
+	err := s.DB.DeleteVeterinarian(ctx.Request().Context(), ID)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}

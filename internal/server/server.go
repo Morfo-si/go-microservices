@@ -20,23 +20,23 @@ type Server interface {
 	UpdateOwner(ctx echo.Context) error
 	DeleteOwner(ctx echo.Context) error
 
-	GetAllProducts(ctx echo.Context) error
-	AddProduct(ctx echo.Context) error
-	GetProductById(ctx echo.Context) error
-	UpdateProduct(ctx echo.Context) error
-	DeleteProduct(ctx echo.Context) error
+	GetAllAppointments(ctx echo.Context) error
+	AddAppointment(ctx echo.Context) error
+	GetAppointmentById(ctx echo.Context) error
+	UpdateAppointment(ctx echo.Context) error
+	DeleteAppointment(ctx echo.Context) error
 
-	GetAllServices(ctx echo.Context) error
-	AddService(ctx echo.Context) error
-	GetServiceById(ctx echo.Context) error
-	UpdateService(ctx echo.Context) error
-	DeleteService(ctx echo.Context) error
+	GetAllPets(ctx echo.Context) error
+	AddPet(ctx echo.Context) error
+	GetPetById(ctx echo.Context) error
+	UpdatePet(ctx echo.Context) error
+	DeletePet(ctx echo.Context) error
 
-	GetAllVendors(ctx echo.Context) error
-	AddVendor(ctx echo.Context) error
-	GetVendorById(ctx echo.Context) error
-	UpdateVendor(ctx echo.Context) error
-	DeleteVendor(ctx echo.Context) error
+	GetAllVeterinarians(ctx echo.Context) error
+	AddVeterinarian(ctx echo.Context) error
+	GetVeterinarianById(ctx echo.Context) error
+	UpdateVeterinarian(ctx echo.Context) error
+	DeleteVeterinarian(ctx echo.Context) error
 }
 
 type EchoServer struct {
@@ -72,26 +72,26 @@ func (s *EchoServer) registerRoutes() {
 	og.PUT("/:id", s.UpdateOwner)
 	og.DELETE("/:id", s.DeleteOwner)
 
-	pg := s.echo.Group("/products")
-	pg.GET("", s.GetAllProducts)
-	pg.GET("/:id", s.GetProductById)
-	pg.POST("", s.AddProduct)
-	pg.PUT("/:id", s.UpdateProduct)
-	pg.DELETE("/:id", s.DeleteProduct)
+	ag := s.echo.Group("/appointments")
+	ag.GET("", s.GetAllAppointments)
+	ag.GET("/:id", s.GetAppointmentById)
+	ag.POST("", s.AddAppointment)
+	ag.PUT("/:id", s.UpdateAppointment)
+	ag.DELETE("/:id", s.DeleteAppointment)
 
-	sg := s.echo.Group("/services")
-	sg.GET("", s.GetAllServices)
-	sg.GET("/:id", s.GetServiceById)
-	sg.POST("", s.AddService)
-	sg.PUT("/:id", s.UpdateService)
-	sg.DELETE("/:id", s.DeleteService)
+	pg := s.echo.Group("/pets")
+	pg.GET("", s.GetAllPets)
+	pg.GET("/:id", s.GetPetById)
+	pg.POST("", s.AddPet)
+	pg.PUT("/:id", s.UpdatePet)
+	pg.DELETE("/:id", s.DeletePet)
 
-	vg := s.echo.Group("/vendors")
-	vg.GET("", s.GetAllVendors)
-	vg.GET("/:id", s.GetVendorById)
-	vg.POST("", s.AddVendor)
-	vg.PUT("/:id", s.UpdateVendor)
-	vg.DELETE("/:id", s.DeleteVendor)
+	vg := s.echo.Group("/veterinarians")
+	vg.GET("", s.GetAllVeterinarians)
+	vg.GET("/:id", s.GetVeterinarianById)
+	vg.POST("", s.AddVeterinarian)
+	vg.PUT("/:id", s.UpdateVeterinarian)
+	vg.DELETE("/:id", s.DeleteVeterinarian)
 }
 
 func (s *EchoServer) Readiness(ctx echo.Context) error {

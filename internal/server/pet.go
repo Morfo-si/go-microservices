@@ -8,22 +8,20 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllProducts(ctx echo.Context) error {
-	vendorId := ctx.QueryParam("vendorId")
-
-	products, err := s.DB.GetAllProducts(ctx.Request().Context(), vendorId)
+func (s *EchoServer) GetAllPets(ctx echo.Context) error {
+	pets, err := s.DB.GetAllPets(ctx.Request().Context())
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(http.StatusOK, products)
+	return ctx.JSON(http.StatusOK, pets)
 }
 
-func (s *EchoServer) AddProduct(ctx echo.Context) error {
-	product := new(models.Product)
-	if err := ctx.Bind(product); err != nil {
+func (s *EchoServer) AddPet(ctx echo.Context) error {
+	pet := new(models.Pet)
+	if err := ctx.Bind(pet); err != nil {
 		return ctx.JSON(http.StatusUnsupportedMediaType, err)
 	}
-	product, err := s.DB.AddProduct(ctx.Request().Context(), product)
+	pet, err := s.DB.AddPet(ctx.Request().Context(), pet)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.ConflictError:
@@ -32,12 +30,12 @@ func (s *EchoServer) AddProduct(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusCreated, product)
+	return ctx.JSON(http.StatusCreated, pet)
 }
 
-func (s *EchoServer) GetProductById(ctx echo.Context) error {
+func (s *EchoServer) GetPetById(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	product, err := s.DB.GetProductById(ctx.Request().Context(), ID)
+	pet, err := s.DB.GetPetById(ctx.Request().Context(), ID)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
@@ -46,19 +44,19 @@ func (s *EchoServer) GetProductById(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, product)
+	return ctx.JSON(http.StatusOK, pet)
 }
 
-func (s *EchoServer) UpdateProduct(ctx echo.Context) error {
+func (s *EchoServer) UpdatePet(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	product := new(models.Product)
-	if err := ctx.Bind(product); err != nil {
+	pet := new(models.Pet)
+	if err := ctx.Bind(pet); err != nil {
 		return ctx.JSON(http.StatusUnsupportedMediaType, err)
 	}
-	if ID != product.ProductID {
+	if ID != pet.PetID {
 		return ctx.JSON(http.StatusBadRequest, "id on path doesn't match id on body")
 	}
-	product, err := s.DB.UpdateProduct(ctx.Request().Context(), product)
+	pet, err := s.DB.UpdatePet(ctx.Request().Context(), pet)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
@@ -69,12 +67,12 @@ func (s *EchoServer) UpdateProduct(ctx echo.Context) error {
 			return ctx.JSON(http.StatusInternalServerError, err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, product)
+	return ctx.JSON(http.StatusOK, pet)
 }
 
-func (s *EchoServer) DeleteProduct(ctx echo.Context) error {
+func (s *EchoServer) DeletePet(ctx echo.Context) error {
 	ID := ctx.Param("id")
-	err := s.DB.DeleteProduct(ctx.Request().Context(), ID)
+	err := s.DB.DeletePet(ctx.Request().Context(), ID)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, err)
 	}
