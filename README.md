@@ -32,7 +32,7 @@ make start-db
 
 ## Create the database schema
 
-Execute the following command to create the `pet_clinic` database schema:
+Execute the following command to create the `petclinic` database schema:
 
 ```shell
 make apply-db-schema
@@ -40,7 +40,7 @@ make apply-db-schema
 
 ### Database Schema Description
 
-The schema `pet_clinic` contains the following tables:
+The schema `petclinic` contains the following tables:
 
 #### Table: `owners`
 
@@ -87,7 +87,7 @@ This table stores information about the appointments.
 
 ## Populate the database
 
-Once the `pet_clinic` database schema is created, execute the following command to populate the `postgresql` database with sample data:
+Once the `petclinic` database schema is created, execute the following command to populate the `postgresql` database with sample data:
 
 ```shell
 make populate-db

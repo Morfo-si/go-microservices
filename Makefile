@@ -1,6 +1,6 @@
 # Define variables
 CONTAINER_NAME=petclinic-pg
-DB_NAME=postgres
+DB_NAME=petclinic
 POSTGRES_PASSWORD=postgres
 POSTGRES_USERNAME=postgres
 POSTGRES_PORT=5432
@@ -9,7 +9,7 @@ DATA_FILE=dat/data.sql
 SCHEMA_FILE=dat/schema.sql
 
 # Default target
-all: start-db
+all: start-db apply-db-schema populate-db run
 
 # Check for Docker or Podman
 DOCKER_CMD=$(shell command -v docker 2> /dev/null || command -v podman 2> /dev/null)
@@ -21,6 +21,7 @@ apply-db-schema:
 	    exit 1; \
 	fi
 	@sleep 5  # Wait a few seconds to ensure the container is fully up
+	@$(DOCKER_CMD) exec -i $(CONTAINER_NAME) psql -U postgres -c "CREATE DATABASE $(DB_NAME);" || echo "Database $(DB_NAME) already exists."
 	@$(DOCKER_CMD) cp $(SCHEMA_FILE) $(CONTAINER_NAME):/tmp/schema.sql
 	@$(DOCKER_CMD) exec -i $(CONTAINER_NAME) psql -U $(POSTGRES_USERNAME) -d $(DB_NAME) -f /tmp/schema.sql
 	@echo "Schema applied to $(DB_NAME)."

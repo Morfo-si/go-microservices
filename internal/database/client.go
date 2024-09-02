@@ -8,7 +8,6 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
 )
 
 type DatabaseClient interface {
@@ -43,21 +42,16 @@ type Client struct {
 	DB *gorm.DB
 }
 
-const TablePrefix = "pet_clinic."
-
 func NewDatabaseClient() (DatabaseClient, error) {
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%d sslmode=%s",
 		"localhost",
 		"postgres",
 		"postgres",
-		"postgres",
+		"petclinic",
 		5432,
 		"disable",
 	)
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{
-			TablePrefix: TablePrefix,
-		},
 		NowFunc: func() time.Time {
 			return time.Now().UTC()
 		},
