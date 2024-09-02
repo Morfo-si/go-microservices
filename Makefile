@@ -1,10 +1,10 @@
 # Define variables
-CONTAINER_NAME=petclinic-pg
-DB_NAME=petclinic
-POSTGRES_PASSWORD=postgres
-POSTGRES_USERNAME=postgres
-POSTGRES_PORT=5432
-IMAGE_NAME=postgres
+CONTAINER_NAME ?= petclinic-pg
+DB_NAME ?= petclinic
+POSTGRES_PASSWORD ?= postgres
+POSTGRES_USERNAME ?= postgres
+POSTGRES_PORT ?= 5432
+IMAGE_NAME ?= postgres
 DATA_FILE=dat/data.sql
 SCHEMA_FILE=dat/schema.sql
 
