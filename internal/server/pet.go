@@ -3,78 +3,89 @@ package server
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 	"github.com/morfo-si/go-microservices/internal/dberrors"
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllPets(ctx echo.Context) error {
-	pets, err := s.DB.GetAllPets(ctx.Request().Context())
+func (s *GinServer) GetAllPets(ctx *gin.Context) {
+	pets, err := s.DB.GetAllPets(ctx.Request.Context())
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
 	}
-	return ctx.JSON(http.StatusOK, pets)
+	ctx.IndentedJSON(http.StatusOK, pets)
 }
 
-func (s *EchoServer) AddPet(ctx echo.Context) error {
+func (s *GinServer) AddPet(ctx *gin.Context) {
 	pet := new(models.Pet)
-	if err := ctx.Bind(pet); err != nil {
-		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+	if err := ctx.BindJSON(pet); err != nil {
+		ctx.JSON(http.StatusUnsupportedMediaType, err)
+		return
 	}
-	pet, err := s.DB.AddPet(ctx.Request().Context(), pet)
+	pet, err := s.DB.AddPet(ctx.Request.Context(), pet)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.ConflictError:
-			return ctx.JSON(http.StatusConflict, err)
+			ctx.JSON(http.StatusConflict, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusCreated, pet)
+	ctx.IndentedJSON(http.StatusCreated, pet)
 }
 
-func (s *EchoServer) GetPetById(ctx echo.Context) error {
+func (s *GinServer) GetPetById(ctx *gin.Context) {
 	ID := ctx.Param("id")
-	pet, err := s.DB.GetPetById(ctx.Request().Context(), ID)
+	pet, err := s.DB.GetPetById(ctx.Request.Context(), ID)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err)
+			ctx.JSON(http.StatusNotFound, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusOK, pet)
+	ctx.IndentedJSON(http.StatusOK, pet)
 }
 
-func (s *EchoServer) UpdatePet(ctx echo.Context) error {
+func (s *GinServer) UpdatePet(ctx *gin.Context) {
 	ID := ctx.Param("id")
 	pet := new(models.Pet)
 	if err := ctx.Bind(pet); err != nil {
-		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+		ctx.JSON(http.StatusUnsupportedMediaType, err)
+		return
 	}
 	if ID != pet.PetID {
-		return ctx.JSON(http.StatusBadRequest, "id on path doesn't match id on body")
+		ctx.JSON(http.StatusBadRequest, "id on path doesn't match id on body")
+		return
 	}
-	pet, err := s.DB.UpdatePet(ctx.Request().Context(), pet)
+	pet, err := s.DB.UpdatePet(ctx.Request.Context(), pet)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err)
+			ctx.JSON(http.StatusNotFound, err)
+			return
 		case *dberrors.ConflictError:
-			return ctx.JSON(http.StatusConflict, err)
+			ctx.JSON(http.StatusConflict, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusOK, pet)
+	ctx.IndentedJSON(http.StatusOK, pet)
 }
 
-func (s *EchoServer) DeletePet(ctx echo.Context) error {
+func (s *GinServer) DeletePet(ctx *gin.Context) {
 	ID := ctx.Param("id")
-	err := s.DB.DeletePet(ctx.Request().Context(), ID)
+	err := s.DB.DeletePet(ctx.Request.Context(), ID)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, err)
 	}
-	return ctx.NoContent(http.StatusResetContent)
+	ctx.JSON(http.StatusResetContent, nil)
 }

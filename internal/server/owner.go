@@ -3,80 +3,92 @@ package server
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 	"github.com/morfo-si/go-microservices/internal/dberrors"
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllOwners(ctx echo.Context) error {
-	emailAddress := ctx.QueryParam("emailAddress")
+func (s *GinServer) GetAllOwners(ctx *gin.Context) {
+	emailAddress := ctx.Param("emailAddress")
 
-	owners, err := s.DB.GetAllOwners(ctx.Request().Context(), emailAddress)
+	owners, err := s.DB.GetAllOwners(ctx.Request.Context(), emailAddress)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
 	}
-	return ctx.JSON(http.StatusOK, owners)
+	ctx.IndentedJSON(http.StatusOK, owners)
 }
 
-func (s *EchoServer) AddOwner(ctx echo.Context) error {
+func (s *GinServer) AddOwner(ctx *gin.Context) {
 	owner := new(models.Owner)
 	if err := ctx.Bind(owner); err != nil {
-		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+		ctx.JSON(http.StatusUnsupportedMediaType, err)
+		return
 	}
-	owner, err := s.DB.AddOwner(ctx.Request().Context(), owner)
+	owner, err := s.DB.AddOwner(ctx.Request.Context(), owner)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.ConflictError:
-			return ctx.JSON(http.StatusConflict, err)
+			ctx.JSON(http.StatusConflict, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusCreated, owner)
+	ctx.IndentedJSON(http.StatusCreated, owner)
 }
 
-func (s *EchoServer) GetOwnerById(ctx echo.Context) error {
+func (s *GinServer) GetOwnerById(ctx *gin.Context) {
 	ID := ctx.Param("id")
-	owner, err := s.DB.GetOwnerById(ctx.Request().Context(), ID)
+	owner, err := s.DB.GetOwnerById(ctx.Request.Context(), ID)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err)
+			ctx.JSON(http.StatusNotFound, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusOK, owner)
+	ctx.IndentedJSON(http.StatusOK, owner)
 }
 
-func (s *EchoServer) UpdateOwner(ctx echo.Context) error {
+func (s *GinServer) UpdateOwner(ctx *gin.Context) {
 	ID := ctx.Param("id")
 	owner := new(models.Owner)
 	if err := ctx.Bind(owner); err != nil {
-		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+		ctx.JSON(http.StatusUnsupportedMediaType, err)
+		return
 	}
 	if ID != owner.OwnerID {
-		return ctx.JSON(http.StatusBadRequest, "id on path does not match id on body")
+		ctx.JSON(http.StatusBadRequest, "id on path does not match id on body")
+		return
 	}
-	owner, err := s.DB.UpdateOwner(ctx.Request().Context(), owner)
+	owner, err := s.DB.UpdateOwner(ctx.Request.Context(), owner)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err)
+			ctx.JSON(http.StatusNotFound, err)
+			return
 		case *dberrors.ConflictError:
-			return ctx.JSON(http.StatusConflict, err)
+			ctx.JSON(http.StatusConflict, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusOK, owner)
+	ctx.IndentedJSON(http.StatusOK, owner)
 }
 
-func (s *EchoServer) DeleteOwner(ctx echo.Context) error {
+func (s *GinServer) DeleteOwner(ctx *gin.Context) {
 	ID := ctx.Param("id")
-	err := s.DB.DeleteOwner(ctx.Request().Context(), ID)
+	err := s.DB.DeleteOwner(ctx.Request.Context(), ID)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
 	}
-	return ctx.NoContent(http.StatusResetContent)
+	ctx.JSON(http.StatusResetContent, nil)
 }

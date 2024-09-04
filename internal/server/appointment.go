@@ -3,80 +3,92 @@ package server
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gin-gonic/gin"
 	"github.com/morfo-si/go-microservices/internal/dberrors"
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllAppointments(ctx echo.Context) error {
-	appointmentId := ctx.QueryParam("appointmentId")
+func (s *GinServer) GetAllAppointments(ctx *gin.Context) {
+	appointmentId := ctx.Param("appointmentId")
 
-	appointments, err := s.DB.GetAllAppointments(ctx.Request().Context(), appointmentId)
+	appointments, err := s.DB.GetAllAppointments(ctx.Request.Context(), appointmentId)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
 	}
-	return ctx.JSON(http.StatusOK, appointments)
+	ctx.IndentedJSON(http.StatusOK, appointments)
 }
 
-func (s *EchoServer) AddAppointment(ctx echo.Context) error {
+func (s *GinServer) AddAppointment(ctx *gin.Context) {
 	appointment := new(models.Appointment)
 	if err := ctx.Bind(appointment); err != nil {
-		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+		ctx.JSON(http.StatusUnsupportedMediaType, err)
+		return
 	}
-	appointment, err := s.DB.AddAppointment(ctx.Request().Context(), appointment)
+	appointment, err := s.DB.AddAppointment(ctx.Request.Context(), appointment)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.ConflictError:
-			return ctx.JSON(http.StatusConflict, err)
+			ctx.JSON(http.StatusConflict, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusCreated, appointment)
+	ctx.IndentedJSON(http.StatusCreated, appointment)
 }
 
-func (s *EchoServer) GetAppointmentById(ctx echo.Context) error {
+func (s *GinServer) GetAppointmentById(ctx *gin.Context) {
 	ID := ctx.Param("id")
-	appointment, err := s.DB.GetAppointmentById(ctx.Request().Context(), ID)
+	appointment, err := s.DB.GetAppointmentById(ctx.Request.Context(), ID)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err)
+			ctx.JSON(http.StatusNotFound, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusOK, appointment)
+	ctx.IndentedJSON(http.StatusOK, appointment)
 }
 
-func (s *EchoServer) UpdateAppointment(ctx echo.Context) error {
+func (s *GinServer) UpdateAppointment(ctx *gin.Context) {
 	ID := ctx.Param("id")
 	appointment := new(models.Appointment)
 	if err := ctx.Bind(appointment); err != nil {
-		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+		ctx.JSON(http.StatusUnsupportedMediaType, err)
+		return
 	}
 	if ID != appointment.AppointmentID {
-		return ctx.JSON(http.StatusBadRequest, "id on path doesn't match id on body")
+		ctx.JSON(http.StatusBadRequest, "id on path doesn't match id on body")
+		return
 	}
-	appointment, err := s.DB.UpdateAppointment(ctx.Request().Context(), appointment)
+	appointment, err := s.DB.UpdateAppointment(ctx.Request.Context(), appointment)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err)
+			ctx.JSON(http.StatusNotFound, err)
+			return
 		case *dberrors.ConflictError:
-			return ctx.JSON(http.StatusConflict, err)
+			ctx.JSON(http.StatusConflict, err)
+			return
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 	}
-	return ctx.JSON(http.StatusOK, appointment)
+	ctx.IndentedJSON(http.StatusOK, appointment)
 }
 
-func (s *EchoServer) DeleteAppointment(ctx echo.Context) error {
+func (s *GinServer) DeleteAppointment(ctx *gin.Context) {
 	ID := ctx.Param("id")
-	err := s.DB.DeleteAppointment(ctx.Request().Context(), ID)
+	err := s.DB.DeleteAppointment(ctx.Request.Context(), ID)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
 	}
-	return ctx.NoContent(http.StatusResetContent)
+	ctx.JSON(http.StatusResetContent, nil)
 }
