@@ -6,7 +6,7 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllOwners(ctx fiber.Ctx) error {
+func (s *AppServer) GetAllOwners(ctx fiber.Ctx) error {
 	emailAddress := ctx.Params("emailAddress")
 
 	owners, err := s.DB.GetAllOwners(ctx.Context(), emailAddress)
@@ -16,7 +16,7 @@ func (s *EchoServer) GetAllOwners(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(owners)
 }
 
-func (s *EchoServer) AddOwner(ctx fiber.Ctx) error {
+func (s *AppServer) AddOwner(ctx fiber.Ctx) error {
 	owner := new(models.Owner)
 	if err := ctx.Bind().Body(owner); err != nil {
 		return ctx.Status(fiber.StatusUnsupportedMediaType).JSON(err)
@@ -33,7 +33,7 @@ func (s *EchoServer) AddOwner(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusCreated).JSON(owner)
 }
 
-func (s *EchoServer) GetOwnerById(ctx fiber.Ctx) error {
+func (s *AppServer) GetOwnerById(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	owner, err := s.DB.GetOwnerById(ctx.Context(), ID)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *EchoServer) GetOwnerById(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(owner)
 }
 
-func (s *EchoServer) UpdateOwner(ctx fiber.Ctx) error {
+func (s *AppServer) UpdateOwner(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	owner := new(models.Owner)
 	if err := ctx.Bind().Body(owner); err != nil {
@@ -70,7 +70,7 @@ func (s *EchoServer) UpdateOwner(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(owner)
 }
 
-func (s *EchoServer) DeleteOwner(ctx fiber.Ctx) error {
+func (s *AppServer) DeleteOwner(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	err := s.DB.DeleteOwner(ctx.Context(), ID)
 	if err != nil {

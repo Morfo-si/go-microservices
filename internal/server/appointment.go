@@ -6,7 +6,7 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllAppointments(ctx fiber.Ctx) error {
+func (s *AppServer) GetAllAppointments(ctx fiber.Ctx) error {
 	appointmentId := ctx.Params("appointmentId")
 
 	appointments, err := s.DB.GetAllAppointments(ctx.Context(), appointmentId)
@@ -16,7 +16,7 @@ func (s *EchoServer) GetAllAppointments(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(appointments)
 }
 
-func (s *EchoServer) AddAppointment(ctx fiber.Ctx) error {
+func (s *AppServer) AddAppointment(ctx fiber.Ctx) error {
 	appointment := new(models.Appointment)
 	if err := ctx.Bind().Body(appointment); err != nil {
 		return ctx.Status(fiber.StatusUnsupportedMediaType).JSON(err)
@@ -34,7 +34,7 @@ func (s *EchoServer) AddAppointment(ctx fiber.Ctx) error {
 	return ctx.JSON(appointment)
 }
 
-func (s *EchoServer) GetAppointmentById(ctx fiber.Ctx) error {
+func (s *AppServer) GetAppointmentById(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	appointment, err := s.DB.GetAppointmentById(ctx.Context(), ID)
 	if err != nil {
@@ -48,7 +48,7 @@ func (s *EchoServer) GetAppointmentById(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(appointment)
 }
 
-func (s *EchoServer) UpdateAppointment(ctx fiber.Ctx) error {
+func (s *AppServer) UpdateAppointment(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	appointment := new(models.Appointment)
 	if err := ctx.Bind().Body(appointment); err != nil {
@@ -71,7 +71,7 @@ func (s *EchoServer) UpdateAppointment(ctx fiber.Ctx) error {
 	return ctx.Status(fiber.StatusOK).JSON(appointment)
 }
 
-func (s *EchoServer) DeleteAppointment(ctx fiber.Ctx) error {
+func (s *AppServer) DeleteAppointment(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	err := s.DB.DeleteAppointment(ctx.Context(), ID)
 	if err != nil {

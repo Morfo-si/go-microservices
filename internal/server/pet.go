@@ -8,7 +8,7 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllPets(ctx fiber.Ctx) error {
+func (s *AppServer) GetAllPets(ctx fiber.Ctx) error {
 	pets, err := s.DB.GetAllPets(ctx.Context())
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(err)
@@ -16,7 +16,7 @@ func (s *EchoServer) GetAllPets(ctx fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(pets)
 }
 
-func (s *EchoServer) AddPet(ctx fiber.Ctx) error {
+func (s *AppServer) AddPet(ctx fiber.Ctx) error {
 	pet := new(models.Pet)
 	if err := ctx.Bind().Body(pet); err != nil {
 		return ctx.Status(http.StatusUnsupportedMediaType).JSON(err)
@@ -33,7 +33,7 @@ func (s *EchoServer) AddPet(ctx fiber.Ctx) error {
 	return ctx.Status(http.StatusCreated).JSON(pet)
 }
 
-func (s *EchoServer) GetPetById(ctx fiber.Ctx) error {
+func (s *AppServer) GetPetById(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	pet, err := s.DB.GetPetById(ctx.Context(), ID)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *EchoServer) GetPetById(ctx fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(pet)
 }
 
-func (s *EchoServer) UpdatePet(ctx fiber.Ctx) error {
+func (s *AppServer) UpdatePet(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	pet := new(models.Pet)
 	if err := ctx.Bind().Body(pet); err != nil {
@@ -70,7 +70,7 @@ func (s *EchoServer) UpdatePet(ctx fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(pet)
 }
 
-func (s *EchoServer) DeletePet(ctx fiber.Ctx) error {
+func (s *AppServer) DeletePet(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	err := s.DB.DeletePet(ctx.Context(), ID)
 	if err != nil {

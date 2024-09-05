@@ -8,7 +8,7 @@ import (
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllVeterinarians(ctx fiber.Ctx) error {
+func (s *AppServer) GetAllVeterinarians(ctx fiber.Ctx) error {
 	veterinarians, err := s.DB.GetAllVeterinarians(ctx.Context())
 	if err != nil {
 		return ctx.Status(http.StatusInternalServerError).JSON(err)
@@ -16,7 +16,7 @@ func (s *EchoServer) GetAllVeterinarians(ctx fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(veterinarians)
 }
 
-func (s *EchoServer) AddVeterinarian(ctx fiber.Ctx) error {
+func (s *AppServer) AddVeterinarian(ctx fiber.Ctx) error {
 	veterinarian := new(models.Veterinarian)
 	if err := ctx.Bind().Body(veterinarian); err != nil {
 		return ctx.Status(http.StatusUnsupportedMediaType).JSON(err)
@@ -33,7 +33,7 @@ func (s *EchoServer) AddVeterinarian(ctx fiber.Ctx) error {
 	return ctx.Status(http.StatusCreated).JSON(veterinarian)
 }
 
-func (s *EchoServer) GetVeterinarianById(ctx fiber.Ctx) error {
+func (s *AppServer) GetVeterinarianById(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	veterinarian, err := s.DB.GetVeterinarianById(ctx.Context(), ID)
 	if err != nil {
@@ -47,7 +47,7 @@ func (s *EchoServer) GetVeterinarianById(ctx fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(veterinarian)
 }
 
-func (s *EchoServer) UpdateVeterinarian(ctx fiber.Ctx) error {
+func (s *AppServer) UpdateVeterinarian(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	veterinarian := new(models.Veterinarian)
 	if err := ctx.Bind().Body(veterinarian); err != nil {
@@ -70,7 +70,7 @@ func (s *EchoServer) UpdateVeterinarian(ctx fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(veterinarian)
 }
 
-func (s *EchoServer) DeleteVeterinarian(ctx fiber.Ctx) error {
+func (s *AppServer) DeleteVeterinarian(ctx fiber.Ctx) error {
 	ID := ctx.Params("id")
 	err := s.DB.DeleteVeterinarian(ctx.Context(), ID)
 	if err != nil {
