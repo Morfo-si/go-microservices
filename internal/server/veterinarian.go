@@ -3,78 +3,78 @@ package server
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v3"
 	"github.com/morfo-si/go-microservices/internal/dberrors"
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
-func (s *EchoServer) GetAllVeterinarians(ctx echo.Context) error {
-	veterinarians, err := s.DB.GetAllVeterinarians(ctx.Request().Context())
+func (s *EchoServer) GetAllVeterinarians(ctx fiber.Ctx) error {
+	veterinarians, err := s.DB.GetAllVeterinarians(ctx.Context())
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		return ctx.Status(http.StatusInternalServerError).JSON(err)
 	}
-	return ctx.JSON(http.StatusOK, veterinarians)
+	return ctx.Status(http.StatusOK).JSON(veterinarians)
 }
 
-func (s *EchoServer) AddVeterinarian(ctx echo.Context) error {
+func (s *EchoServer) AddVeterinarian(ctx fiber.Ctx) error {
 	veterinarian := new(models.Veterinarian)
-	if err := ctx.Bind(veterinarian); err != nil {
-		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+	if err := ctx.Bind().Body(veterinarian); err != nil {
+		return ctx.Status(http.StatusUnsupportedMediaType).JSON(err)
 	}
-	veterinarian, err := s.DB.AddVeterinarian(ctx.Request().Context(), veterinarian)
+	veterinarian, err := s.DB.AddVeterinarian(ctx.Context(), veterinarian)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.ConflictError:
-			return ctx.JSON(http.StatusConflict, err)
+			return ctx.Status(http.StatusConflict).JSON(err)
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			return ctx.Status(http.StatusInternalServerError).JSON(err)
 		}
 	}
-	return ctx.JSON(http.StatusCreated, veterinarian)
+	return ctx.Status(http.StatusCreated).JSON(veterinarian)
 }
 
-func (s *EchoServer) GetVeterinarianById(ctx echo.Context) error {
-	ID := ctx.Param("id")
-	veterinarian, err := s.DB.GetVeterinarianById(ctx.Request().Context(), ID)
+func (s *EchoServer) GetVeterinarianById(ctx fiber.Ctx) error {
+	ID := ctx.Params("id")
+	veterinarian, err := s.DB.GetVeterinarianById(ctx.Context(), ID)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err)
+			return ctx.Status(http.StatusNotFound).JSON(err)
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			return ctx.Status(http.StatusInternalServerError).JSON(err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, veterinarian)
+	return ctx.Status(http.StatusOK).JSON(veterinarian)
 }
 
-func (s *EchoServer) UpdateVeterinarian(ctx echo.Context) error {
-	ID := ctx.Param("id")
+func (s *EchoServer) UpdateVeterinarian(ctx fiber.Ctx) error {
+	ID := ctx.Params("id")
 	veterinarian := new(models.Veterinarian)
-	if err := ctx.Bind(veterinarian); err != nil {
-		return ctx.JSON(http.StatusUnsupportedMediaType, err)
+	if err := ctx.Bind().Body(veterinarian); err != nil {
+		return ctx.Status(http.StatusUnsupportedMediaType).JSON(err)
 	}
 	if ID != veterinarian.VeterinarianID {
-		return ctx.JSON(http.StatusBadRequest, "id on path doesn't match id on body")
+		return ctx.Status(http.StatusBadRequest).JSON("id on path doesn't match id on body")
 	}
-	veterinarian, err := s.DB.UpdateVeterinarian(ctx.Request().Context(), veterinarian)
+	veterinarian, err := s.DB.UpdateVeterinarian(ctx.Context(), veterinarian)
 	if err != nil {
 		switch err.(type) {
 		case *dberrors.NotFoundError:
-			return ctx.JSON(http.StatusNotFound, err)
+			return ctx.Status(http.StatusNotFound).JSON(err)
 		case *dberrors.ConflictError:
-			return ctx.JSON(http.StatusConflict, err)
+			return ctx.Status(http.StatusConflict).JSON(err)
 		default:
-			return ctx.JSON(http.StatusInternalServerError, err)
+			return ctx.Status(http.StatusInternalServerError).JSON(err)
 		}
 	}
-	return ctx.JSON(http.StatusOK, veterinarian)
+	return ctx.Status(http.StatusOK).JSON(veterinarian)
 }
 
-func (s *EchoServer) DeleteVeterinarian(ctx echo.Context) error {
-	ID := ctx.Param("id")
-	err := s.DB.DeleteVeterinarian(ctx.Request().Context(), ID)
+func (s *EchoServer) DeleteVeterinarian(ctx fiber.Ctx) error {
+	ID := ctx.Params("id")
+	err := s.DB.DeleteVeterinarian(ctx.Context(), ID)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, err)
+		return ctx.Status(http.StatusInternalServerError).JSON(err)
 	}
-	return ctx.NoContent(http.StatusResetContent)
+	return ctx.Status(http.StatusResetContent).JSON(nil)
 }

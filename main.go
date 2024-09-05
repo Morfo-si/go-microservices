@@ -18,8 +18,5 @@ func main() {
 		log.Fatalf("failed to initialize the database client: %s", err)
 	}
 	srv := server.NewEchoServer(db)
-
-	if err := srv.Start(); err != nil {
-		log.Fatal(err.Error())
-	}
+	log.Fatal(srv.Start())
 }

@@ -3,58 +3,77 @@ package server
 import (
 	"log"
 	"net/http"
+	"os"
+	"time"
 
-	"github.com/labstack/echo/v4"
+	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/logger"
 	"github.com/morfo-si/go-microservices/internal/database"
 	"github.com/morfo-si/go-microservices/internal/models"
 )
 
 type Server interface {
 	Start() error
-	Readiness(ctx echo.Context) error
-	Liveness(ctx echo.Context) error
+	Readiness(ctx fiber.Ctx) error
+	Liveness(ctx fiber.Ctx) error
 
-	GetAllOwners(ctx echo.Context) error
-	AddOwner(ctx echo.Context) error
-	GetOwnerById(ctx echo.Context) error
-	UpdateOwner(ctx echo.Context) error
-	DeleteOwner(ctx echo.Context) error
+	GetAllOwners(ctx fiber.Ctx) error
+	AddOwner(ctx fiber.Ctx) error
+	GetOwnerById(ctx fiber.Ctx) error
+	UpdateOwner(ctx fiber.Ctx) error
+	DeleteOwner(ctx fiber.Ctx) error
 
-	GetAllAppointments(ctx echo.Context) error
-	AddAppointment(ctx echo.Context) error
-	GetAppointmentById(ctx echo.Context) error
-	UpdateAppointment(ctx echo.Context) error
-	DeleteAppointment(ctx echo.Context) error
+	GetAllAppointments(ctx fiber.Ctx) error
+	AddAppointment(ctx fiber.Ctx) error
+	GetAppointmentById(ctx fiber.Ctx) error
+	UpdateAppointment(ctx fiber.Ctx) error
+	DeleteAppointment(ctx fiber.Ctx) error
 
-	GetAllPets(ctx echo.Context) error
-	AddPet(ctx echo.Context) error
-	GetPetById(ctx echo.Context) error
-	UpdatePet(ctx echo.Context) error
-	DeletePet(ctx echo.Context) error
+	GetAllPets(ctx fiber.Ctx) error
+	AddPet(ctx fiber.Ctx) error
+	GetPetById(ctx fiber.Ctx) error
+	UpdatePet(ctx fiber.Ctx) error
+	DeletePet(ctx fiber.Ctx) error
 
-	GetAllVeterinarians(ctx echo.Context) error
-	AddVeterinarian(ctx echo.Context) error
-	GetVeterinarianById(ctx echo.Context) error
-	UpdateVeterinarian(ctx echo.Context) error
-	DeleteVeterinarian(ctx echo.Context) error
+	GetAllVeterinarians(ctx fiber.Ctx) error
+	AddVeterinarian(ctx fiber.Ctx) error
+	GetVeterinarianById(ctx fiber.Ctx) error
+	UpdateVeterinarian(ctx fiber.Ctx) error
+	DeleteVeterinarian(ctx fiber.Ctx) error
 }
 
 type EchoServer struct {
-	echo *echo.Echo
+	app *fiber.App
 	DB   database.DatabaseClient
 }
 
 func NewEchoServer(db database.DatabaseClient) Server {
 	server := &EchoServer{
-		echo: echo.New(),
-		DB:   db,
+		app: fiber.New(fiber.Config{
+			AppName:       "PetClinic",
+			BodyLimit:     fiber.DefaultBodyLimit,
+			ServerHeader:  "PetClinic",
+			StrictRouting: false,
+			ReadTimeout:   1 * time.Second,
+			WriteTimeout:  1 * time.Second,
+			IdleTimeout:   10 * time.Second,
+		}),
+		DB: db,
 	}
+
+	server.app.Use(logger.New(logger.Config{
+		Format:        "${time} [${ip}]:${port} ${status} - ${method} ${path}\n",
+		TimeZone:      "UTC",
+		Output:        os.Stdout,
+		DisableColors: false,
+	}))
+
 	server.registerRoutes()
 	return server
 }
 
 func (s *EchoServer) Start() error {
-	if err := s.echo.Start(":8080"); err != nil && err != http.ErrServerClosed {
+	if err := s.app.Listen(":8080"); err != nil && err != http.ErrServerClosed {
 		log.Fatalf("server shutdown occurred: %s", err)
 		return err
 	}
@@ -62,46 +81,49 @@ func (s *EchoServer) Start() error {
 }
 
 func (s *EchoServer) registerRoutes() {
-	s.echo.GET("/readiness", s.Readiness)
-	s.echo.GET("/liveness", s.Liveness)
+	s.app.Get("/readiness", s.Readiness)
+	s.app.Get("/liveness", s.Liveness)
 
-	og := s.echo.Group("/owners")
-	og.GET("", s.GetAllOwners)
-	og.GET("/:id", s.GetOwnerById)
-	og.POST("", s.AddOwner)
-	og.PUT("/:id", s.UpdateOwner)
-	og.DELETE("/:id", s.DeleteOwner)
+	og := s.app.Group("/owners")
+	og.Get("", s.GetAllOwners)
+	og.Get("/:id", s.GetOwnerById)
+	og.Post("", s.AddOwner)
+	og.Put("/:id", s.UpdateOwner)
+	og.Delete("/:id", s.DeleteOwner)
 
-	ag := s.echo.Group("/appointments")
-	ag.GET("", s.GetAllAppointments)
-	ag.GET("/:id", s.GetAppointmentById)
-	ag.POST("", s.AddAppointment)
-	ag.PUT("/:id", s.UpdateAppointment)
-	ag.DELETE("/:id", s.DeleteAppointment)
+	ag := s.app.Group("/appointments")
+	ag.Get("", s.GetAllAppointments)
+	ag.Get("/:id", s.GetAppointmentById)
+	ag.Post("", s.AddAppointment)
+	ag.Put("/:id", s.UpdateAppointment)
+	ag.Delete("/:id", s.DeleteAppointment)
 
-	pg := s.echo.Group("/pets")
-	pg.GET("", s.GetAllPets)
-	pg.GET("/:id", s.GetPetById)
-	pg.POST("", s.AddPet)
-	pg.PUT("/:id", s.UpdatePet)
-	pg.DELETE("/:id", s.DeletePet)
+	pg := s.app.Group("/pets")
+	pg.Get("", s.GetAllPets)
+	pg.Get("/:id", s.GetPetById)
+	pg.Post("", s.AddPet)
+	pg.Put("/:id", s.UpdatePet)
+	pg.Delete("/:id", s.DeletePet)
 
-	vg := s.echo.Group("/veterinarians")
-	vg.GET("", s.GetAllVeterinarians)
-	vg.GET("/:id", s.GetVeterinarianById)
-	vg.POST("", s.AddVeterinarian)
-	vg.PUT("/:id", s.UpdateVeterinarian)
-	vg.DELETE("/:id", s.DeleteVeterinarian)
+	vg := s.app.Group("/veterinarians")
+	vg.Get("", s.GetAllVeterinarians)
+	vg.Get("/:id", s.GetVeterinarianById)
+	vg.Post("", s.AddVeterinarian)
+	vg.Put("/:id", s.UpdateVeterinarian)
+	vg.Delete("/:id", s.DeleteVeterinarian)
 }
 
-func (s *EchoServer) Readiness(ctx echo.Context) error {
+func (s *EchoServer) Readiness(ctx fiber.Ctx) error {
 	ready := s.DB.Ready()
 	if ready {
-		return ctx.JSON(http.StatusOK, models.Health{Status: "OK"})
+		ctx.Status(fiber.StatusOK)
+		return ctx.JSON(models.Health{Status: "OK"})
 	}
-	return ctx.JSON(http.StatusInternalServerError, models.Health{Status: "Failure"})
+	ctx.Status(fiber.StatusInternalServerError)
+	return ctx.JSON(models.Health{Status: "Failure"})
 }
 
-func (s *EchoServer) Liveness(ctx echo.Context) error {
-	return ctx.JSON(http.StatusOK, models.Health{Status: "OK"})
+func (s *EchoServer) Liveness(ctx fiber.Ctx) error {
+	ctx.Status(fiber.StatusOK)
+	return ctx.JSON(models.Health{Status: "OK"})
 }
